@@ -10,13 +10,17 @@ print(df.info())
 print(df.head())
 
 # Clean data
-df = None
-
+index_min = int(len(df) * 2.5 / 100)
+index_max = int(len(df) * 97.5 / 100)
+df = df.iloc[index_min:index_max]
+print(df.info())
+print(df.head())
 
 def draw_line_plot():
     # Draw line plot
-
-
+    fig, axes = plt.subplots()
+    axes.plot(df.index, df['value'])    
+    
 
 
 
