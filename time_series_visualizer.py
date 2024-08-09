@@ -5,25 +5,30 @@ from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
 # Import data (Make sure to parse dates. Consider setting index column to 'date'.)
-df = pd.read_csv('fcc-forum-pageviews.csv', index_col='date')
+df = pd.read_csv('fcc-forum-pageviews.csv')
+df["date"] = pd.to_datetime(df["date"])
+df = df.set_index('date')
 print(df.info())
 print(df.head())
 
 # Clean data
-index_min = int(len(df) * 2.5 / 100)
-index_max = int(len(df) * 97.5 / 100)
-df = df.iloc[index_min:index_max]
+# Clean the data by filtering out days when the page views were in the top 2.5% of the dataset or bottom 2.5% of the dataset.
+df = df.loc[(df['value'] >= df['value'].quantile(0.025)) & (df['value'] <= df['value'].quantile(0.975))]
 print(df.info())
 print(df.head())
 
 def draw_line_plot():
     # Draw line plot
-    fig, axes = plt.subplots()
-    axes.plot(df.index, df['value'])    
+    fig, axes = plt.subplots(figsize=(32, 10))
+    sns.lineplot(data=df, x=df.index, y=df['value'], ax=axes) 
     
-
-
-
+    # Setting the title of the figure
+    axes.set_title('Daily freeCodeCamp Forum Page Views 5/2016-12/2019')
+    # Labeling the x-axis
+    axes.set_xlabel('Date')
+    # Labeling the y-axis
+    axes.set_ylabel('Page Views')  
+    
     # Save image and return fig (don't change this part)
     fig.savefig('line_plot.png')
     return fig
