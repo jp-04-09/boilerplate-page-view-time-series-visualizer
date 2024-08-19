@@ -4,6 +4,8 @@ import seaborn as sns
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
+# DO THIS FIRST pip install seaborn --upgrade
+
 # Import data (Make sure to parse dates. Consider setting index column to 'date'.)
 df = pd.read_csv('fcc-forum-pageviews.csv')
 df["date"] = pd.to_datetime(df["date"])
@@ -35,9 +37,15 @@ def draw_line_plot():
 
 def draw_bar_plot():
     # Copy and modify data for monthly bar plot
-    df_bar = None
+    df_bar = df.groupby(pd.Grouper(freq="M")).mean().reset_index()
+    df_bar['year'] = df_bar['date'].dt.year
+    df_bar['month'] = df_bar['date'].dt.month
+    print(df_bar)
+    Months = ["January", "February", "March", "April", "June", "July", "August", "September", "October", "November", "December"]
 
     # Draw bar plot
+    fig, axes = plt.subplots(figsize=(32, 10))
+    sns.barplot(data=df_bar, x=df_bar.index, y=df_bar['value'], ax=axes)
 
 
 
