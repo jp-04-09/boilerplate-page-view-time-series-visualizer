@@ -37,23 +37,16 @@ def draw_line_plot():
 
 def draw_bar_plot():
     # Copy and modify data for monthly bar plot
-    df_bar = df.groupby(pd.Grouper(freq="M")).mean().reset_index()
-    df_bar['year'] = df_bar['date'].dt.year
-    df_bar['month_number'] = df_bar['date'].dt.month
-    df_bar['month_name'] = pd.to_datetime(df_bar['month_number'], format='%m').dt.strftime('%B')
-    df_bar = df_bar.drop(columns=['date', 'month_number'])
-    df_bar = df_bar.rename(columns={'month_name': 'month'})
+    # Extracting month and year from index
+    df['month'] = df.index.month
+    df['year'] = df.index.year
+    df_bar = df.groupby(["year", "month"])["value"].mean()
+    df_bar = df_bar.unstack()
     print(df_bar)
     
     # Draw bar plot
-    fig, axes = plt.subplots(figsize=(32, 10))
-    sns.barplot(data=df_bar, x=df_bar['year'], y=df_bar['value'], hue=df_bar['month'], ax=axes)
-    # Labeling the x-axis
-    axes.set_xlabel('Years')
-    # Labeling the y-axis
-    axes.set_ylabel('Average Page Views')  
-    # Customizing the Legend title
-    axes.legend(title='Months')
+    fig = df_bar.plot.bar(legend=True, figsize=(13, 6), ylabel='Average Page Views', xlabel='Years').figure
+    plt.legend(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'])
 
     # Save image and return fig (don't change this part)
     fig.savefig('bar_plot.png')
