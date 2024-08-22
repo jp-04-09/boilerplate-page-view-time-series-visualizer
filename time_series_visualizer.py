@@ -15,7 +15,7 @@ print(df.head())
 
 # Clean data
 # Clean the data by filtering out days when the page views were in the top 2.5% of the dataset or bottom 2.5% of the dataset.
-df = df.loc[(df['value'] >= df['value'].quantile(0.025)) & (df['value'] <= df['value'].quantile(0.975))]
+df = df[(df['value'] >= df['value'].quantile(0.025)) & (df['value'] <= df['value'].quantile(0.975))]
 print(df.info())
 print(df.head())
 
@@ -38,9 +38,10 @@ def draw_line_plot():
 def draw_bar_plot():
     # Copy and modify data for monthly bar plot
     # Extracting month and year from index
-    df['month'] = df.index.month
-    df['year'] = df.index.year
-    df_bar = df.groupby(["year", "month"])["value"].mean()
+    df_copy = df.copy()
+    df_copy['month'] = df_copy.index.month
+    df_copy['year'] = df_copy.index.year
+    df_bar = df_copy.groupby(["year", "month"])["value"].mean()
     df_bar = df_bar.unstack()
     print(df_bar)
     
@@ -61,12 +62,26 @@ def draw_box_plot():
 
     print(df_box)
 
+    # Define the order of months
+    month_order = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     # Draw box plots (using Seaborn)
-    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2)
+    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(18, 8))
     sns.boxplot(data=df_box, x=df_box['year'], y=df_box['value'], ax=ax1)
+    # Setting the title of the figure
+    ax1.set_title('Year-wise Box Plot (Trend)')
+    # Labeling the x-axis
+    ax1.set_xlabel('Year')
+    # Labeling the y-axis
+    ax1.set_ylabel('Page Views')  
 
 
-    sns.boxplot(data=df_box, x=df_box['year'], y=df_box['value'], ax=ax2)
+    sns.boxplot(data=df_box, x=df_box['month'], y=df_box['value'], ax=ax2, order=month_order)
+    # Setting the title of the figure
+    ax2.set_title('Month-wise Box Plot (Seasonality)')
+    # Labeling the x-axis
+    ax2.set_xlabel('Month')
+    # Labeling the y-axis
+    ax2.set_ylabel('Page Views')  
 
 
 
